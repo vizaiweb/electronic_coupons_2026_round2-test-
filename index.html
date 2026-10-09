@@ -145,6 +145,36 @@
         .btn-danger {
             background: #e76f51;
         }
+
+        /* 新增記錄按鈕 —— 橙色漸變、整行寬度、帶陰影 */
+.btn-add-voucher {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #ffb347, #ff8c42);
+    color: #ffffff;
+    border: none;
+    border-radius: 40px;
+    padding: 12px 20px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(255, 140, 66, 0.35);
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.btn-add-voucher:hover {
+    background: linear-gradient(135deg, #ffa033, #ff7a2e);
+    box-shadow: 0 6px 16px rgba(255, 140, 66, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-add-voucher:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
+}
+        
         .btn-sm {
             padding: 4px 10px;
             font-size: 0.7rem;
@@ -524,7 +554,7 @@
                         <option value="">-- 請選擇錢包 --</option>
                     </select>
                 </div>
-                <button class="btn" id="addVoucherBtn">➕ 記錄抽中優惠券</button>
+                <button class="btn-add-voucher" id="addVoucherBtn">➕ 記錄抽中優惠券</button>
 
                 <div class="hint-box" style="margin-top:16px; margin-bottom:0;">
                     👴 <strong>長者／殘評證人士：</strong>另享額外 <strong>500 MOP 立減優惠</strong>，拍卡後消費以 5%（半價）扣減。
