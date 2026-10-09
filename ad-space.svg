@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="728" height="90" viewBox="0 0 728 90">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e5f9e"/>
+      <stop offset="100%" stop-color="#14406e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="728" height="90" rx="16" fill="url(#bg)"/>
+
+  <!-- 裝飾圓 -->
+  <circle cx="690" cy="15" r="40" fill="#ffffff" opacity="0.06"/>
+  <circle cx="40" cy="85" r="30" fill="#ffffff" opacity="0.06"/>
+
+  <!-- 左側 AD 圖示 -->
+  <rect x="24" y="24" width="42" height="42" rx="10" fill="#f4a261"/>
+  <text x="45" y="51" font-family="system-ui, sans-serif" font-size="16"
+        text-anchor="middle" fill="#ffffff" font-weight="bold">AD</text>
+
+  <!-- 主標題 -->
+  <text x="86" y="38" font-family="system-ui, sans-serif" font-size="18"
+        fill="#ffffff" font-weight="bold">廣告位招租</text>
+
+  <!-- 副標題 -->
+  <text x="86" y="62" font-family="system-ui, sans-serif" font-size="13"
+        fill="#cfe2f7">澳門本地精準曝光 · 工具頁面穩定展示 · 詳情請聯絡</text>
+
+  <!-- 右側按鈕 -->
+  <rect x="560" y="25" width="144" height="40" rx="20" fill="#ffffff" opacity="0.95"/>
+  <text x="632" y="50" font-family="system-ui, sans-serif" font-size="15"
+        fill="#1e5f9e" font-weight="bold" text-anchor="middle">聯絡我們</text>
+</svg>
