@@ -502,6 +502,31 @@
             padding: 8px 12px;
             line-height: 1.5;
         }
+
+/* 向右滑動提示 */
+.scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e5f9e;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-left: 6px;
+    animation: scrollHintPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes scrollHintPulse {
+    0%, 100% { transform: translateX(0); opacity: 0.7; }
+    50%      { transform: translateX(4px); opacity: 1; }
+}
+
+/* 桌機上表格不會橫向溢出，隱藏提示 */
+@media (min-width: 801px) {
+    .scroll-hint {
+        display: none;
+    }
+}
+        
     </style>
 </head>
 <body>
@@ -602,6 +627,7 @@
                         <option value="gift">消費禮遇券</option>
                     </select>
                     <span id="filterResultCount" class="filter-badge">0 筆記錄</span>
+                    <span class="scroll-hint" title="表格可向右滑動查看更多">→</span>
                 </div>
                 <div class="table-responsive">
                     <table id="vouchersTable">
