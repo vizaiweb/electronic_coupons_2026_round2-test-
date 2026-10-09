@@ -912,21 +912,27 @@
         let weekFilterSelect = document.getElementById('weekFilterSelect');
 
         if(weekStatsSelect) {
-            let oldStatsVal = weekStatsSelect.value;
-            weekStatsSelect.innerHTML = '';
-            weeksData.forEach(wk => {
-                let option = document.createElement('option');
-                option.value = wk.key;
-                option.textContent = wk.label;
-                weekStatsSelect.appendChild(option);
-            });
-            if(oldStatsVal && weeksData.some(w => w.key === oldStatsVal)) {
-                weekStatsSelect.value = oldStatsVal;
-            } else if(weeksData.length) {
-                weekStatsSelect.value = getDefaultWeekKey() || weeksData[0].key;
-            }
-            weekStatsSelect.dispatchEvent(new Event('change'));
-        }
+    let oldStatsVal = weekStatsSelect.value;
+    weekStatsSelect.innerHTML = '';
+    weeksData.forEach(wk => {
+        let option = document.createElement('option');
+        option.value = wk.key;
+        option.textContent = wk.label;
+        weekStatsSelect.appendChild(option);
+    });
+    // 新增「活動期間」總計選項
+    let totalOption = document.createElement('option');
+    totalOption.value = 'all_total';
+    totalOption.textContent = '活動期間：2026/10/09 ~ 2026/12/13（總計）';
+    weekStatsSelect.appendChild(totalOption);
+
+    if(oldStatsVal && (oldStatsVal === 'all_total' || weeksData.some(w => w.key === oldStatsVal))) {
+        weekStatsSelect.value = oldStatsVal;
+    } else if(weeksData.length) {
+        weekStatsSelect.value = getDefaultWeekKey() || weeksData[0].key;
+    }
+    weekStatsSelect.dispatchEvent(new Event('change'));
+}
 
         if(weekFilterSelect) {
             let currentFilterValue = weekFilterSelect.value;
@@ -1149,34 +1155,42 @@
         return vouchers.filter(v => v.weekKey === weekKey);
     }
 
-    function updateStatsBySelectedWeek() {
-        let weekSelect = document.getElementById('weekStatsSelect');
-        if(!weekSelect || !weekSelect.value) return;
-        let weekKey = weekSelect.value;
-        let weekVouchers = getVouchersByWeek(weekKey);
+   function updateStatsBySelectedWeek() {
+    let weekSelect = document.getElementById('weekStatsSelect');
+    if(!weekSelect || !weekSelect.value) return;
+    let weekKey = weekSelect.value;
 
-        let govVouchers = weekVouchers.filter(v => (v.couponType || 'gov') === 'gov');
-        let merchantVouchers = weekVouchers.filter(v => (v.couponType || 'gov') !== 'gov');
+    // 「活動期間」時，取全部記錄；否則只取該週
+    let weekVouchers = (weekKey === 'all_total') ? [...vouchers] : getVouchersByWeek(weekKey);
 
-        let totalAmount = govVouchers.reduce((sum, v) => sum + v.amount, 0);
-        let totalMinSpend = govVouchers.reduce((sum, v) => sum + (v.amount * 3), 0);
-        let usedGovVouchers = govVouchers.filter(v => v.used);
-        let totalSpent = usedGovVouchers.reduce((sum, v) => sum + (v.amount * 3), 0);
-        let merchantCount = merchantVouchers.length;
+    // 政府券與商戶券分開
+    let govVouchers = weekVouchers.filter(v => (v.couponType || 'gov') === 'gov');
+    let merchantVouchers = weekVouchers.filter(v => (v.couponType || 'gov') !== 'gov');
 
-        document.getElementById('weekTotalVoucherAmount').innerText = totalAmount.toFixed(0);
-        document.getElementById('weekTotalMinSpend').innerText = totalMinSpend.toFixed(0);
-        document.getElementById('weekTotalSpent').innerText = totalSpent.toFixed(0);
-        document.getElementById('weekMerchantCount').innerText = merchantCount;
+    let totalAmount = govVouchers.reduce((sum, v) => sum + v.amount, 0);
+    let totalMinSpend = govVouchers.reduce((sum, v) => sum + (v.amount * 3), 0);
+    let usedGovVouchers = govVouchers.filter(v => v.used);
+    let totalSpent = usedGovVouchers.reduce((sum, v) => sum + (v.amount * 3), 0);
+    let merchantCount = merchantVouchers.length;
 
-        let wk = weeksData.find(w => w.key === weekKey);
-        let deadlineEl = document.getElementById('weekRedeemDeadline');
-        if (deadlineEl) {
+    document.getElementById('weekTotalVoucherAmount').innerText = totalAmount.toFixed(0);
+    document.getElementById('weekTotalMinSpend').innerText = totalMinSpend.toFixed(0);
+    document.getElementById('weekTotalSpent').innerText = totalSpent.toFixed(0);
+    document.getElementById('weekMerchantCount').innerText = merchantCount;
+
+    // 核銷截止日
+    let deadlineEl = document.getElementById('weekRedeemDeadline');
+    if (deadlineEl) {
+        if (weekKey === 'all_total') {
+            deadlineEl.innerText = '—';
+        } else {
+            let wk = weeksData.find(w => w.key === weekKey);
             deadlineEl.innerText = (wk && wk.redeemDeadline)
                 ? formatDate(wk.redeemDeadline) + '（週四）'
                 : '—';
         }
     }
+}
 
     function addVoucher() {
         let weekSelect = document.getElementById('weekSelectAdd');
