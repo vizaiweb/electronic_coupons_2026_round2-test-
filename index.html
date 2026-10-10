@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>2026社區消費連環賞 - 優惠券管理器</title>
     <meta name="description" content="澳門2026社區消費連環賞，簡潔實用的電子優惠券記錄工具。">
-    <meta name="keywords" content="2026社區消費連環賞,澳門社區消費,電子優惠券">
     <style>
         * {
             box-sizing: border-box;
@@ -25,7 +24,6 @@
             padding: 16px;
         }
 
-        /* ===== 頂部標題 ===== */
         .app-header {
             display: flex;
             align-items: center;
@@ -52,7 +50,6 @@
             background: #e8eef7;
         }
 
-        /* ===== 活動日期卡 ===== */
         .activity-card {
             background: #ffffff;
             border-radius: 20px;
@@ -107,7 +104,6 @@
             color: #a16b1a;
         }
 
-        /* ===== 統計卡片（兩張） ===== */
         .stats-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -155,7 +151,6 @@
             margin-left: 3px;
         }
 
-        /* ===== 區塊標題 ===== */
         .section-title {
             display: flex;
             align-items: center;
@@ -195,14 +190,15 @@
             font-weight: 600;
             outline: none;
             cursor: pointer;
-            max-width: 180px;
             font-family: inherit;
+            width: auto;
+            min-width: 160px;
+            max-width: 100%;
         }
         .week-view-select:focus {
             border-color: #1e5f9e;
         }
 
-        /* ===== 錢包分組卡片 ===== */
         .wallet-group {
             background: #ffffff;
             border-radius: 20px;
@@ -241,7 +237,6 @@
             color: #7b8a9e;
         }
 
-        /* ===== 券小卡片 ===== */
         .voucher-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -304,11 +299,6 @@
             color: #2d5a1b;
             font-size: 1.05rem;
         }
-        .voucher-card .v-amount small {
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 2px;
-        }
         .voucher-card .v-status {
             font-size: 0.7rem;
             font-weight: 700;
@@ -330,7 +320,24 @@
             font-weight: 600;
         }
 
-        /* ===== 空狀態 ===== */
+        /* 剩餘天數提示 */
+        .days-remaining {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #8b5a1a;
+            background: #fff8ee;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid #ffe0b0;
+        }
+        .days-remaining.urgent {
+            color: #c94a2c;
+            background: #fdf0ed;
+            border-color: #f5c9c0;
+        }
+
         .empty-state {
             background: #ffffff;
             border-radius: 20px;
@@ -350,7 +357,6 @@
             font-size: 0.85rem;
         }
 
-        /* ===== 懸浮按鈕 ===== */
         .fab {
             position: fixed;
             right: 20px;
@@ -376,7 +382,6 @@
             transform: scale(0.94);
         }
 
-        /* ===== 彈窗 (通用) ===== */
         .overlay {
             display: none;
             position: fixed;
@@ -434,7 +439,6 @@
             justify-content: center;
         }
 
-        /* ===== 表單欄位 ===== */
         .field {
             margin-bottom: 14px;
         }
@@ -498,7 +502,6 @@
             box-shadow: 0 4px 12px rgba(231, 111, 81, 0.35);
         }
 
-        /* ===== 詳情彈窗內容 ===== */
         .detail-amount {
             text-align: center;
             padding: 16px 0 8px;
@@ -564,7 +567,6 @@
             grid-column: 1 / -1;
         }
 
-        /* ===== 設定清單 ===== */
         .settings-list {
             display: flex;
             flex-direction: column;
@@ -596,6 +598,32 @@
             color: #c94a2c;
             background: #fdf0ed;
         }
+
+        /* 語言切換器 */
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .lang-btn {
+            flex: 1;
+            padding: 10px 6px;
+            border: 1.5px solid #d6e3f2;
+            background: #ffffff;
+            color: #1a2f4a;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .lang-btn.active {
+            background: #1e5f9e;
+            color: white;
+            border-color: #1e5f9e;
+        }
+
         .settings-note {
             margin-top: 16px;
             padding: 12px 14px;
@@ -609,10 +637,8 @@
         }
         .settings-note .icon { font-size: 0.95rem; }
 
-        /* ===== 隱藏 input ===== */
         #importFileInput { display: none; }
 
-        /* ===== 桌面優化 ===== */
         @media (min-width: 900px) {
             .app {
                 max-width: 900px;
@@ -636,53 +662,54 @@
             }
         }
 
-        /* ===== 為不同錢包指定顏色 ===== */
         .wallet-avatar[data-wallet="MPay"] { background: #e83f3f; }
-        .wallet-avatar[data-wallet="支付寶（澳門）"] { background: #1677ff; }
-        .wallet-avatar[data-wallet="澳門中銀手機銀行"] { background: #c8102e; }
-        .wallet-avatar[data-wallet="工銀e支付"] { background: #b41f24; }
-        .wallet-avatar[data-wallet="豐付寶"] { background: #00693e; }
-        .wallet-avatar[data-wallet="廣發移動支付錢包"] { background: #c8102e; }
+        .wallet-avatar[data-wallet="支付寶（澳門）"],
+        .wallet-avatar[data-wallet="支付宝（澳门）"] { background: #1677ff; }
+        .wallet-avatar[data-wallet="澳門中銀手機銀行"],
+        .wallet-avatar[data-wallet="澳门中银手机银行"] { background: #c8102e; }
+        .wallet-avatar[data-wallet="工銀e支付"],
+        .wallet-avatar[data-wallet="工银e支付"] { background: #b41f24; }
+        .wallet-avatar[data-wallet="豐付寶"],
+        .wallet-avatar[data-wallet="丰付宝"] { background: #00693e; }
+        .wallet-avatar[data-wallet="廣發移動支付錢包"],
+        .wallet-avatar[data-wallet="广发移动支付钱包"] { background: #c8102e; }
         .wallet-avatar[data-wallet="LusoPay"] { background: #e30613; }
-        .wallet-avatar[data-wallet="極易付（UePay）"] { background: #1e5f9e; }
+        .wallet-avatar[data-wallet="極易付（UePay）"],
+        .wallet-avatar[data-wallet="极易付（UePay）"] { background: #1e5f9e; }
     </style>
 </head>
 <body>
 <div class="app">
 
-    <!-- 頂部標題 -->
     <div class="app-header">
-        <h1>優惠券管理器</h1>
+        <h1 data-i18n="appTitle">優惠券管理器</h1>
         <button class="icon-btn" id="settingsBtn" title="設定">⚙️</button>
     </div>
 
-    <!-- 活動日期卡 -->
     <div class="activity-card">
         <div class="activity-left">
             <div class="activity-icon">📅</div>
             <div class="activity-info">
-                <div class="label">活動日期</div>
-                <div class="value" id="activityDateText">2026/10/09 - 2026/12/17</div>
+                <div class="label" data-i18n="activityDate">活動日期</div>
+                <div class="value">2026/10/09 - 2026/12/17</div>
             </div>
         </div>
         <div class="activity-status" id="activityStatus">載入中</div>
     </div>
 
-    <!-- 統計兩張卡片 -->
     <div class="stats-row">
         <div class="stat-card blue">
-            <div class="stat-head"><span class="dot"></span>未使用金額</div>
+            <div class="stat-head"><span class="dot"></span><span data-i18n="statRemaining">未使用金額</span></div>
             <div class="stat-num"><span id="statRemaining">0</span><small>MOP</small></div>
         </div>
         <div class="stat-card purple">
-            <div class="stat-head"><span class="dot"></span>可用優惠額度</div>
+            <div class="stat-head"><span class="dot"></span><span data-i18n="statAvailable">可用優惠額度</span></div>
             <div class="stat-num"><span id="statAvailable">0</span><small>MOP</small></div>
         </div>
     </div>
 
-    <!-- 記錄區域 -->
     <div class="section-title">
-        <h2>我的優惠券</h2>
+        <h2 data-i18n="myCoupons">我的優惠券</h2>
         <div class="right-part">
             <select id="weekViewSelect" class="week-view-select"></select>
             <span class="count" id="totalCount">0 張</span>
@@ -692,58 +719,49 @@
 
 </div>
 
-<!-- 懸浮新增按鈕 -->
 <button class="fab" id="fabAddBtn" title="新增優惠券">+</button>
 
-<!-- ===== 新增彈窗 ===== -->
+<!-- 新增彈窗 -->
 <div class="overlay" id="addOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
-            <h3>➕ 新增優惠券</h3>
+            <h3 data-i18n="addTitle">➕ 新增優惠券</h3>
             <button class="close-btn" data-close="addOverlay">✕</button>
         </div>
 
         <div class="field">
-            <label>📆 領券週</label>
+            <label data-i18n="labelWeek">📆 領券週</label>
             <select id="weekSelectAdd"></select>
         </div>
 
         <div class="field">
-            <label>🏷️ 券種</label>
+            <label data-i18n="labelType">🏷️ 券種</label>
             <select id="couponTypeSelect">
-                <option value="gov" selected>政府電子優惠券</option>
-                <option value="merchant_discount">商戶滿減券（滿100減12）</option>
-                <option value="gift">消費禮遇券（禮品）</option>
+                <option value="gov" data-i18n="typeGov">政府電子優惠券</option>
+                <option value="merchant_discount" data-i18n="typeMerchant">商戶滿減券（滿100減12）</option>
+                <option value="gift" data-i18n="typeGift">消費禮遇券（禮品）</option>
             </select>
         </div>
 
         <div class="field">
-            <label>💰 面額 / 內容</label>
-            <select id="voucherAmountSelect">
-                <option value="10">10 MOP</option>
-                <option value="20">20 MOP</option>
-                <option value="50" selected>50 MOP</option>
-                <option value="100">100 MOP</option>
-                <option value="200">200 MOP</option>
-            </select>
+            <label data-i18n="labelAmount">💰 面額 / 內容</label>
+            <select id="voucherAmountSelect"></select>
         </div>
 
         <div class="field">
-            <label>👛 電子錢包</label>
-            <select id="walletSelect">
-                <option value="">-- 請選擇錢包 --</option>
-            </select>
+            <label data-i18n="labelWallet">👛 電子錢包</label>
+            <select id="walletSelect"></select>
         </div>
 
-        <button class="submit-btn" id="addVoucherBtn">確認新增</button>
+        <button class="submit-btn" id="addVoucherBtn" data-i18n="btnConfirmAdd">確認新增</button>
     </div>
 </div>
 
-<!-- ===== 詳情彈窗 ===== -->
+<!-- 詳情彈窗 -->
 <div class="overlay" id="detailOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
-            <h3>優惠券詳情</h3>
+            <h3 data-i18n="detailTitle">優惠券詳情</h3>
             <button class="close-btn" data-close="detailOverlay">✕</button>
         </div>
 
@@ -754,148 +772,341 @@
 
         <div class="detail-rows">
             <div class="detail-row">
-                <span class="k">📆 歸屬週次</span>
+                <span class="k" data-i18n="rowWeek">📆 歸屬週次</span>
                 <span class="v" id="detailWeek">--</span>
             </div>
             <div class="detail-row">
-                <span class="k">👛 電子錢包</span>
+                <span class="k" data-i18n="rowWallet">👛 電子錢包</span>
                 <span class="v" id="detailWallet">--</span>
             </div>
             <div class="detail-row">
-                <span class="k">🎯 最低消費額</span>
+                <span class="k" data-i18n="rowMinSpend">🎯 最低消費額</span>
                 <span class="v" id="detailMinSpend">--</span>
             </div>
             <div class="detail-row">
-                <span class="k">📌 使用狀態</span>
+                <span class="k" data-i18n="rowDeadline">⏳ 核銷截止</span>
+                <span class="v" id="detailDeadline">--</span>
+            </div>
+            <div class="detail-row">
+                <span class="k" data-i18n="rowStatus">📌 使用狀態</span>
                 <span class="v" id="detailStatus">--</span>
             </div>
             <div class="detail-row">
-                <span class="k">📝 備註</span>
+                <span class="k" data-i18n="rowNote">📝 備註</span>
                 <span class="v" id="detailNote">--</span>
             </div>
         </div>
 
         <div class="detail-actions">
-            <button class="submit-btn" id="detailUseBtn">✅ 標記已用</button>
-            <button class="submit-btn danger" id="detailDeleteBtn">🗑️ 刪除</button>
-            <button class="submit-btn secondary detail-note-btn" id="detailNoteBtn">✏️ 編輯備註</button>
+            <button class="submit-btn" id="detailUseBtn" data-i18n="btnUse">✅ 標記已用</button>
+            <button class="submit-btn danger" id="detailDeleteBtn" data-i18n="btnDelete">🗑️ 刪除</button>
+            <button class="submit-btn secondary detail-note-btn" id="detailNoteBtn" data-i18n="btnEditNote">✏️ 編輯備註</button>
         </div>
     </div>
 </div>
 
-<!-- ===== 備註編輯彈窗 ===== -->
+<!-- 備註編輯 -->
 <div class="overlay" id="noteOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
-            <h3>✏️ 編輯備註</h3>
+            <h3 data-i18n="noteTitle">✏️ 編輯備註</h3>
             <button class="close-btn" data-close="noteOverlay">✕</button>
         </div>
         <div class="field">
-            <textarea id="noteInput" placeholder="輸入備註資訊...&#10;例如：使用店家、消費明細、到期日等"></textarea>
+            <textarea id="noteInput" data-i18n-ph="notePlaceholder" placeholder="輸入備註資訊..."></textarea>
         </div>
-        <button class="submit-btn" id="saveNoteBtn">儲存備註</button>
+        <button class="submit-btn" id="saveNoteBtn" data-i18n="btnSaveNote">儲存備註</button>
     </div>
 </div>
 
-<!-- ===== 設定彈窗 ===== -->
+<!-- 設定彈窗 -->
 <div class="overlay" id="settingsOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
-            <h3>⚙️ 設定</h3>
+            <h3 data-i18n="settingsTitle">⚙️ 設定</h3>
             <button class="close-btn" data-close="settingsOverlay">✕</button>
+        </div>
+
+        <div class="lang-switcher">
+            <button class="lang-btn" data-lang="zh-HK">繁體中文</button>
+            <button class="lang-btn" data-lang="zh-CN">简体中文</button>
+            <button class="lang-btn" data-lang="en">English</button>
         </div>
 
         <div class="settings-list">
             <button class="settings-item" id="saveDataBtn">
-                <span class="icon">💾</span> 手動儲存至瀏覽器
+                <span class="icon">💾</span> <span data-i18n="btnSave">手動儲存至瀏覽器</span>
             </button>
             <button class="settings-item" id="exportDataBtn">
-                <span class="icon">📁</span> 匯出資料 (JSON)
+                <span class="icon">📁</span> <span data-i18n="btnExport">匯出資料 (JSON)</span>
             </button>
             <button class="settings-item" id="importDataBtn">
-                <span class="icon">📂</span> 匯入資料 (JSON)
+                <span class="icon">📂</span> <span data-i18n="btnImport">匯入資料 (JSON)</span>
             </button>
             <input type="file" id="importFileInput" accept=".json">
             <button class="settings-item danger" id="resetDataBtn">
-                <span class="icon">⚠️</span> 重置所有數據
+                <span class="icon">⚠️</span> <span data-i18n="btnReset">重置所有數據</span>
             </button>
         </div>
 
         <div class="settings-note">
             <span class="icon">🔒</span>
-            <span>隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。<br>
-            <span style="display:inline-block;margin-top:6px;">總訪問次數：<strong id="vercount_value_page_pv">—</strong>　訪客人數：<strong id="vercount_value_page_uv">—</strong></span></span>
+            <span data-i18n="privacyNote">隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。</span>
         </div>
     </div>
 </div>
 
 <script>
+    /* ===== 多語言 ===== */
+    const I18N = {
+        'zh-HK': {
+            appTitle: '優惠券管理器',
+            activityDate: '活動日期',
+            statusPending: '即將開始',
+            statusActive: '活動進行中',
+            statusEnded: '已結束',
+            statRemaining: '未使用金額',
+            statAvailable: '可用優惠額度',
+            myCoupons: '我的優惠券',
+            countUnit: '張',
+            emptyTitle: '此週還沒有任何優惠券記錄',
+            emptyHint: '點擊右下角「+」按鈕新增',
+            addTitle: '➕ 新增優惠券',
+            labelWeek: '📆 領券週',
+            labelType: '🏷️ 券種',
+            labelAmount: '💰 面額 / 內容',
+            labelWallet: '👛 電子錢包',
+            typeGov: '政府電子優惠券',
+            typeMerchant: '商戶滿減券（滿100減12）',
+            typeGift: '消費禮遇券（禮品）',
+            walletPlaceholder: '-- 請選擇錢包 --',
+            btnConfirmAdd: '確認新增',
+            detailTitle: '優惠券詳情',
+            rowWeek: '📆 歸屬週次',
+            rowWallet: '👛 電子錢包',
+            rowMinSpend: '🎯 最低消費額',
+            rowDeadline: '⏳ 核銷截止',
+            rowStatus: '📌 使用狀態',
+            rowNote: '📝 備註',
+            statusUnused: '未使用',
+            statusUsed: '已使用',
+            statusExpired: '已過期',
+            statusExpiredLong: '已過期（逾期作廢）',
+            noteEmpty: '（無）',
+            btnUse: '✅ 標記已用',
+            btnDelete: '🗑️ 刪除',
+            btnEditNote: '✏️ 編輯備註',
+            noteTitle: '✏️ 編輯備註',
+            notePlaceholder: '輸入備註資訊...',
+            btnSaveNote: '儲存備註',
+            settingsTitle: '⚙️ 設定',
+            btnSave: '手動儲存至瀏覽器',
+            btnExport: '匯出資料 (JSON)',
+            btnImport: '匯入資料 (JSON)',
+            btnReset: '重置所有數據',
+            privacyNote: '隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。',
+            alertSelectWeek: '請選擇領券週次',
+            alertSelectAmount: '請選擇有效面額',
+            alertSelectWallet: '請選擇電子錢包',
+            confirmUse: '確定標記為已使用？',
+            confirmDelete: '確定刪除？此操作無法復原。',
+            alertAlreadyUsed: '已經使用過',
+            alertExpired: '此券已過期，無法使用',
+            alertSaved: '已儲存',
+            alertImportSuccess: '匯入成功，共 {n} 筆記錄',
+            alertImportFail: '匯入失敗，JSON解析錯誤',
+            alertImportFormat: '檔案格式不正確',
+            confirmReset: '⚠️ 確定要重置所有資料嗎？此操作無法復原。',
+            weekLabelPrefix: '第',
+            weekLabelSuffix: '週',
+            daysRemaining: '距核銷截止：剩 {n} 日',
+            daysRemainingExpired: '核銷期已過',
+            daysRemainingToday: '今日為核銷最後一日',
+            alertNoData: '沒有資料可匯出'
+        },
+        'zh-CN': {
+            appTitle: '优惠券管理器',
+            activityDate: '活动日期',
+            statusPending: '即将开始',
+            statusActive: '活动进行中',
+            statusEnded: '已结束',
+            statRemaining: '未使用金额',
+            statAvailable: '可用优惠额度',
+            myCoupons: '我的优惠券',
+            countUnit: '张',
+            emptyTitle: '此周还没有任何优惠券记录',
+            emptyHint: '点击右下角「+」按钮新增',
+            addTitle: '➕ 新增优惠券',
+            labelWeek: '📆 领券周',
+            labelType: '🏷️ 券种',
+            labelAmount: '💰 面额 / 内容',
+            labelWallet: '👛 电子钱包',
+            typeGov: '政府电子优惠券',
+            typeMerchant: '商户满减券（满100减12）',
+            typeGift: '消费礼遇券（礼品）',
+            walletPlaceholder: '-- 请选择钱包 --',
+            btnConfirmAdd: '确认新增',
+            detailTitle: '优惠券详情',
+            rowWeek: '📆 归属周次',
+            rowWallet: '👛 电子钱包',
+            rowMinSpend: '🎯 最低消费额',
+            rowDeadline: '⏳ 核销截止',
+            rowStatus: '📌 使用状态',
+            rowNote: '📝 备注',
+            statusUnused: '未使用',
+            statusUsed: '已使用',
+            statusExpired: '已过期',
+            statusExpiredLong: '已过期（逾期作废）',
+            noteEmpty: '（无）',
+            btnUse: '✅ 标记已用',
+            btnDelete: '🗑️ 删除',
+            btnEditNote: '✏️ 编辑备注',
+            noteTitle: '✏️ 编辑备注',
+            notePlaceholder: '输入备注信息...',
+            btnSaveNote: '保存备注',
+            settingsTitle: '⚙️ 设置',
+            btnSave: '手动保存至浏览器',
+            btnExport: '导出数据 (JSON)',
+            btnImport: '导入数据 (JSON)',
+            btnReset: '重置所有数据',
+            privacyNote: '隐私保障：所有数据仅存储于您的浏览器本地，绝不上传云端。',
+            alertSelectWeek: '请选择领券周次',
+            alertSelectAmount: '请选择有效面额',
+            alertSelectWallet: '请选择电子钱包',
+            confirmUse: '确定标记为已使用？',
+            confirmDelete: '确定删除？此操作无法复原。',
+            alertAlreadyUsed: '已经使用过',
+            alertExpired: '此券已过期，无法使用',
+            alertSaved: '已保存',
+            alertImportSuccess: '导入成功，共 {n} 笔记录',
+            alertImportFail: '导入失败，JSON解析错误',
+            alertImportFormat: '文件格式不正确',
+            confirmReset: '⚠️ 确定要重置所有数据吗？此操作无法复原。',
+            weekLabelPrefix: '第',
+            weekLabelSuffix: '周',
+            daysRemaining: '距核销截止：剩 {n} 日',
+            daysRemainingExpired: '核销期已过',
+            daysRemainingToday: '今日为核销最后一日',
+            alertNoData: '没有数据可导出'
+        },
+        'en': {
+            appTitle: 'Coupon Manager',
+            activityDate: 'Activity Period',
+            statusPending: 'Upcoming',
+            statusActive: 'Active',
+            statusEnded: 'Ended',
+            statRemaining: 'Unused Amount',
+            statAvailable: 'Available Discount',
+            myCoupons: 'My Coupons',
+            countUnit: '',
+            emptyTitle: 'No coupons recorded for this week',
+            emptyHint: 'Tap "+" at bottom-right to add',
+            addTitle: '➕ Add Coupon',
+            labelWeek: '📆 Week',
+            labelType: '🏷️ Type',
+            labelAmount: '💰 Amount / Content',
+            labelWallet: '👛 E-Wallet',
+            typeGov: 'Government E-Coupon',
+            typeMerchant: 'Merchant Discount (100-12)',
+            typeGift: 'Consumption Gift',
+            walletPlaceholder: '-- Select wallet --',
+            btnConfirmAdd: 'Confirm',
+            detailTitle: 'Coupon Details',
+            rowWeek: '📆 Week',
+            rowWallet: '👛 E-Wallet',
+            rowMinSpend: '🎯 Min. Spend',
+            rowDeadline: '⏳ Redeem By',
+            rowStatus: '📌 Status',
+            rowNote: '📝 Note',
+            statusUnused: 'Unused',
+            statusUsed: 'Used',
+            statusExpired: 'Expired',
+            statusExpiredLong: 'Expired',
+            noteEmpty: '(none)',
+            btnUse: '✅ Mark Used',
+            btnDelete: '🗑️ Delete',
+            btnEditNote: '✏️ Edit Note',
+            noteTitle: '✏️ Edit Note',
+            notePlaceholder: 'Enter note...',
+            btnSaveNote: 'Save Note',
+            settingsTitle: '⚙️ Settings',
+            btnSave: 'Save to Browser',
+            btnExport: 'Export Data (JSON)',
+            btnImport: 'Import Data (JSON)',
+            btnReset: 'Reset All Data',
+            privacyNote: 'Privacy: All data is stored locally in your browser only.',
+            alertSelectWeek: 'Please select week',
+            alertSelectAmount: 'Please select valid amount',
+            alertSelectWallet: 'Please select wallet',
+            confirmUse: 'Mark as used?',
+            confirmDelete: 'Delete? This cannot be undone.',
+            alertAlreadyUsed: 'Already used',
+            alertExpired: 'Expired, cannot use',
+            alertSaved: 'Saved',
+            alertImportSuccess: 'Imported {n} records',
+            alertImportFail: 'Import failed: JSON error',
+            alertImportFormat: 'Invalid file format',
+            confirmReset: '⚠️ Reset all data? This cannot be undone.',
+            weekLabelPrefix: 'Week ',
+            weekLabelSuffix: '',
+            daysRemaining: 'Redeem within {n} day(s)',
+            daysRemainingExpired: 'Redemption period over',
+            daysRemainingToday: 'Last day to redeem',
+            alertNoData: 'No data to export'
+        }
+    };
+
+    /* ===== 各語言對應的錢包顯示名稱 ===== */
+    const WALLET_NAMES = {
+        'zh-HK': ["MPay", "支付寶（澳門）", "澳門中銀手機銀行", "工銀e支付", "豐付寶", "廣發移動支付錢包", "LusoPay", "極易付（UePay）"],
+        'zh-CN': ["MPay", "支付宝（澳门）", "澳门中银手机银行", "工银e支付", "丰付宝", "广发移动支付钱包", "LusoPay", "极易付（UePay）"],
+        'en':    ["MPay", "Alipay (Macau)", "BOC Macau", "ICBC e-Pay", "Fung Fu Bao", "CGB Mobile Wallet", "LusoPay", "UePay"]
+    };
+
+    /* ===== 各語言對應的券種顯示名稱 ===== */
+    const COUPON_TYPE_LABELS = {
+        'zh-HK': { gov: '政府電子優惠券', merchant_discount: '商戶滿減券', gift: '消費禮遇券' },
+        'zh-CN': { gov: '政府电子优惠券', merchant_discount: '商户满减券', gift: '消费礼遇券' },
+        'en':    { gov: 'Government E-Coupon', merchant_discount: 'Merchant Discount', gift: 'Consumption Gift' }
+    };
+
     /* ===== 活動設定 ===== */
     const ACTIVITY_START = new Date(2026, 9, 9);
     const ACTIVITY_END   = new Date(2026, 11, 17);
     const STORAGE_KEY = 'macau_voucher_2026_round2';
+    const LANG_KEY = 'macau_voucher_2026_lang';
 
-    const COUPON_TYPES = {
-        gov: {
-            label: '政府電子優惠券',
-            amounts: [10, 20, 50, 100, 200],
-            defaultAmount: 50,
-            minSpendMultiplier: 3
-        },
-        merchant_discount: {
-            label: '商戶滿減券',
-            amounts: [12],
-            defaultAmount: 12,
-            minSpendMultiplier: 0,
-            fixedMinSpend: 100,
-            displayText: '滿100減12'
-        },
-        gift: {
-            label: '消費禮遇券',
-            amounts: [0],
-            defaultAmount: 0,
-            minSpendMultiplier: 0,
-            displayText: '禮品'
+    let currentLang = 'zh-HK';
+
+    function t(key, params) {
+        let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N['zh-HK'][key] || key;
+        if (params) {
+            Object.keys(params).forEach(k => {
+                str = str.replace('{' + k + '}', params[k]);
+            });
         }
+        return str;
+    }
+
+    function getWalletNames() {
+        return WALLET_NAMES[currentLang] || WALLET_NAMES['zh-HK'];
+    }
+
+    /* ===== 券種設定（內部鍵值固定，不受語言影響） ===== */
+    const COUPON_TYPES = {
+        gov: { defaultAmount: 50, minSpendMultiplier: 3 },
+        merchant_discount: { defaultAmount: 12, minSpendMultiplier: 0, fixedMinSpend: 100 },
+        gift: { defaultAmount: 0, minSpendMultiplier: 0 }
     };
-
-    function getCouponTypeInfo(type) {
-        return COUPON_TYPES[type] || COUPON_TYPES.gov;
-    }
-    function getMinSpend(voucher) {
-        const ti = getCouponTypeInfo(voucher.couponType);
-        if (ti.fixedMinSpend !== undefined) return ti.fixedMinSpend;
-        return voucher.amount * ti.minSpendMultiplier;
-    }
-    function getAmountDisplay(voucher) {
-        if (voucher.couponType === 'gift') return '禮品';
-        if (voucher.couponType === 'merchant_discount') return '滿100減12';
-        return voucher.amount + ' MOP';
-    }
-    function getMinSpendDisplay(voucher) {
-        if (voucher.couponType === 'gift') return '—';
-        return getMinSpend(voucher) + ' MOP';
-    }
-
-    const WALLETS = [
-        "MPay",
-        "支付寶（澳門）",
-        "澳門中銀手機銀行",
-        "工銀e支付",
-        "豐付寶",
-        "廣發移動支付錢包",
-        "LusoPay",
-        "極易付（UePay）"
-    ];
 
     /* ===== 全域狀態 ===== */
     let vouchers = [];
     let weeksData = [];
     let nextDisplayId = 1;
     let currentDetailId = null;
-    let currentViewWeekKey = '';   // 目前顯示的週次
+    let currentViewWeekKey = '';
 
-    /* ===== 週次生成 ===== */
+    /* ===== 週次 ===== */
     function generateWeeksList() {
         let weeks = [];
         let startFriday = new Date(ACTIVITY_START);
@@ -912,7 +1123,7 @@
             redeemDeadline.setDate(sunday.getDate() + 4);
             weeks.push({
                 key: `${formatDateKey(friday)}_to_${formatDateKey(sunday)}`,
-                label: `第${weekIndex}週 (${formatDate(friday)} ~ ${formatDate(sunday)})`,
+                index: weekIndex,
                 friday: new Date(friday),
                 sunday: new Date(sunday),
                 redeemDeadline: redeemDeadline
@@ -928,9 +1139,19 @@
     function formatDateKey(d) {
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
+    function formatShortDate(d) {
+        return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function getWeekShortLabel(wk) {
+        return `${t('weekLabelPrefix')}${wk.index}${t('weekLabelSuffix')} (${formatShortDate(wk.friday)} ~ ${formatShortDate(wk.sunday)})`;
+    }
+    function getWeekFullLabel(wk) {
+        if (!wk) return '';
+        return `${t('weekLabelPrefix')}${wk.index}${t('weekLabelSuffix')} (${formatShortDate(wk.friday)} ~ ${formatShortDate(wk.sunday)})`;
+    }
     function getWeekLabelByKey(key) {
         const wk = weeksData.find(w => w.key === key);
-        return wk ? wk.label : key;
+        return wk ? getWeekFullLabel(wk) : key;
     }
     function getDefaultWeekKey() {
         const today = new Date();
@@ -958,6 +1179,16 @@
         today.setHours(0, 0, 0, 0);
         return today > wk.redeemDeadline;
     }
+    function getDaysRemaining(voucher) {
+        const wk = weeksData.find(w => w.key === voucher.weekKey);
+        if (!wk || !wk.redeemDeadline) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const deadline = new Date(wk.redeemDeadline);
+        deadline.setHours(0, 0, 0, 0);
+        const diff = Math.round((deadline - today) / (1000 * 60 * 60 * 24));
+        return diff; // >0 剩 n 日, 0 今天, <0 已過期
+    }
 
     /* ===== 資料 ===== */
     function reassignDisplayIds() {
@@ -975,7 +1206,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             vouchers: vouchers,
             nextDisplayId: nextDisplayId,
-            version: '4.1',
+            version: '4.2',
             activity: '2026社區消費連環賞',
             lastUpdated: new Date().toISOString()
         }));
@@ -993,7 +1224,7 @@
                         weekKey: v.weekKey || (weeksData[0]?.key || ''),
                         couponType: v.couponType || 'gov',
                         amount: v.amount || 0,
-                        wallet: v.wallet || WALLETS[0],
+                        wallet: v.wallet || 'MPay',
                         used: v.used === true,
                         usedTimestamp: v.usedTimestamp || null,
                         note: v.note || '',
@@ -1006,22 +1237,45 @@
         reassignDisplayIds();
     }
 
+    function loadLang() {
+        const saved = localStorage.getItem(LANG_KEY);
+        if (saved && I18N[saved]) currentLang = saved;
+    }
+    function saveLang() {
+        localStorage.setItem(LANG_KEY, currentLang);
+    }
+
+    /* ===== i18n 套用 ===== */
+    function applyI18n() {
+        document.documentElement.lang = currentLang === 'en' ? 'en' : (currentLang === 'zh-CN' ? 'zh-CN' : 'zh-HK');
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            el.textContent = t(key);
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+            el.placeholder = t(el.dataset.i18nPh);
+        });
+        // 更新語言按鈕狀態
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === currentLang);
+        });
+    }
+
     /* ===== 渲染 ===== */
     function renderActivityStatus() {
         const today = new Date();
         today.setHours(0,0,0,0);
         const el = document.getElementById('activityStatus');
         if (today < ACTIVITY_START) {
-            el.textContent = '即將開始';
+            el.textContent = t('statusPending');
             el.className = 'activity-status pending';
         } else if (today > ACTIVITY_END) {
-            el.textContent = '已結束';
+            el.textContent = t('statusEnded');
             el.className = 'activity-status ended';
         } else {
-            el.textContent = '活動進行中';
+            el.textContent = t('statusActive');
             el.className = 'activity-status';
         }
-        document.getElementById('activityDateText').textContent = '2026/10/09 - 2026/12/17';
     }
 
     function renderStats() {
@@ -1043,34 +1297,41 @@
     function renderVouchers() {
         const container = document.getElementById('voucherList');
         const targetWeek = currentViewWeekKey || getDefaultWeekKey();
-
-        // 只取所選週次的券
         const weekVouchers = vouchers.filter(v => v.weekKey === targetWeek);
 
         if (weekVouchers.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <span class="emoji">🎫</span>
-                    <p>此週還沒有任何優惠券記錄</p>
-                    <p style="margin-top:6px;font-size:0.78rem;">點擊右下角「+」按鈕新增</p>
+                    <p>${t('emptyTitle')}</p>
+                    <p style="margin-top:6px;font-size:0.78rem;">${t('emptyHint')}</p>
                 </div>`;
-            document.getElementById('totalCount').textContent = '0 張';
+            document.getElementById('totalCount').textContent = `0 ${t('countUnit')}`.trim();
             return;
         }
 
-        document.getElementById('totalCount').textContent = weekVouchers.length + ' 張';
+        document.getElementById('totalCount').textContent = `${weekVouchers.length} ${t('countUnit')}`.trim();
 
-        // 按錢包分組
+        const walletNames = getWalletNames();
         const groups = {};
-        WALLETS.forEach(w => { groups[w] = []; });
+        walletNames.forEach(w => { groups[w] = []; });
+
+        // 把券按當前語言的錢包名稱分組
+        // 資料中的 wallet 儲存的是「原始」名稱（zh-HK），需要映射
+        const originalToLocal = {};
+        const originalNames = WALLET_NAMES['zh-HK'];
+        walletNames.forEach((localName, idx) => {
+            originalToLocal[originalNames[idx]] = localName;
+        });
+
         weekVouchers.forEach(v => {
-            const w = v.wallet || WALLETS[0];
-            if (!groups[w]) groups[w] = [];
-            groups[w].push(v);
+            const localName = originalToLocal[v.wallet] || v.wallet || walletNames[0];
+            if (!groups[localName]) groups[localName] = [];
+            groups[localName].push(v);
         });
 
         let html = '';
-        WALLETS.forEach(w => {
+        walletNames.forEach(w => {
             const list = groups[w] || [];
             if (list.length === 0) return;
 
@@ -1096,15 +1357,15 @@
                 const stateClass = v.used ? 'used' : (expired ? 'expired' : '');
                 let amountHtml = '';
                 if (v.couponType === 'gift') {
-                    amountHtml = `<div class="v-amount">禮品</div>`;
+                    amountHtml = `<div class="v-amount">${escapeHtml(getShortTypeLabel('gift'))}</div>`;
                 } else if (v.couponType === 'merchant_discount') {
-                    amountHtml = `<div class="v-amount">滿100減12</div>`;
+                    amountHtml = `<div class="v-amount">${escapeHtml(getShortTypeLabel('merchant_discount'))}</div>`;
                 } else {
                     amountHtml = `<div class="v-amount">$${v.amount}</div>`;
                 }
-                let statusText = '未使用';
-                if (v.used) statusText = '已使用';
-                else if (expired) statusText = '已過期';
+                let statusText = t('statusUnused');
+                if (v.used) statusText = t('statusUsed');
+                else if (expired) statusText = t('statusExpired');
 
                 html += `
                     <div class="voucher-card ${typeClass} ${stateClass}" data-id="${v.displayId}">
@@ -1117,6 +1378,29 @@
             html += `</div></div>`;
         });
 
+        // 剩餘天數提示（只顯示當前選中的週次，且該週有券）
+        const wk = weeksData.find(w => w.key === targetWeek);
+        if (wk && wk.redeemDeadline) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const deadline = new Date(wk.redeemDeadline);
+            deadline.setHours(0,0,0,0);
+            const diff = Math.round((deadline - today) / (1000 * 60 * 60 * 24));
+            let text = '';
+            let urgent = false;
+            if (diff < 0) {
+                text = t('daysRemainingExpired');
+                urgent = true;
+            } else if (diff === 0) {
+                text = t('daysRemainingToday');
+                urgent = true;
+            } else {
+                text = t('daysRemaining', { n: diff });
+                urgent = diff <= 2;
+            }
+            html += `<div class="days-remaining ${urgent ? 'urgent' : ''}">⏳ ${text}</div>`;
+        }
+
         container.innerHTML = html;
 
         container.querySelectorAll('.voucher-card').forEach(card => {
@@ -1127,15 +1411,26 @@
         });
     }
 
+    function getShortTypeLabel(type) {
+        const labels = COUPON_TYPE_LABELS[currentLang] || COUPON_TYPE_LABELS['zh-HK'];
+        if (type === 'gift') {
+            return currentLang === 'en' ? 'Gift' : (currentLang === 'zh-CN' ? '礼品' : '禮品');
+        }
+        if (type === 'merchant_discount') {
+            return currentLang === 'en' ? '100-12' : '滿100減12';
+        }
+        return '';
+    }
+
     function getWalletShort(w) {
         if (w.includes('MPay')) return 'MP';
-        if (w.includes('支付寶')) return 'AP';
-        if (w.includes('中銀')) return 'BOC';
-        if (w.includes('工銀')) return 'ICBC';
-        if (w.includes('豐付寶')) return 'FBB';
-        if (w.includes('廣發')) return 'GF';
+        if (w.includes('支付寶') || w.includes('支付宝') || w.includes('Alipay')) return 'AP';
+        if (w.includes('中銀') || w.includes('中银') || w.includes('BOC')) return 'BOC';
+        if (w.includes('工銀') || w.includes('工银') || w.includes('ICBC')) return 'ICBC';
+        if (w.includes('豐付') || w.includes('丰付') || w.includes('Fung')) return 'FBB';
+        if (w.includes('廣發') || w.includes('广发') || w.includes('CGB')) return 'GF';
         if (w.includes('Luso')) return 'LP';
-        if (w.includes('極易付')) return 'UE';
+        if (w.includes('極易') || w.includes('极易') || w.includes('UePay')) return 'UE';
         return '💳';
     }
 
@@ -1147,7 +1442,7 @@
         return escapeHtml(s).replace(/"/g, '&quot;');
     }
 
-    /* ===== 週次顯示下拉 ===== */
+    /* ===== 週次下拉 ===== */
     function refreshWeekViewSelect() {
         const sel = document.getElementById('weekViewSelect');
         if (!sel) return;
@@ -1156,7 +1451,7 @@
         weeksData.forEach(wk => {
             const opt = document.createElement('option');
             opt.value = wk.key;
-            opt.textContent = wk.label;
+            opt.textContent = getWeekShortLabel(wk);
             sel.appendChild(opt);
         });
         if (prev && weeksData.some(w => w.key === prev)) {
@@ -1184,7 +1479,7 @@
         weeksData.forEach(wk => {
             const opt = document.createElement('option');
             opt.value = wk.key;
-            opt.textContent = wk.label;
+            opt.textContent = getWeekFullLabel(wk);
             sel.appendChild(opt);
         });
         if (prev && weeksData.some(w => w.key === prev)) {
@@ -1198,28 +1493,27 @@
         const typeSelect = document.getElementById('couponTypeSelect');
         const amountSelect = document.getElementById('voucherAmountSelect');
         const type = typeSelect.value;
-        const ti = getCouponTypeInfo(type);
         amountSelect.innerHTML = '';
         if (type === 'gov') {
-            ti.amounts.forEach(a => {
+            [10, 20, 50, 100, 200].forEach(a => {
                 const o = document.createElement('option');
                 o.value = a;
                 o.textContent = a + ' MOP';
-                if (a === ti.defaultAmount) o.selected = true;
+                if (a === 50) o.selected = true;
                 amountSelect.appendChild(o);
             });
             amountSelect.disabled = false;
         } else if (type === 'merchant_discount') {
             const o = document.createElement('option');
             o.value = 12;
-            o.textContent = '滿100減12';
+            o.textContent = currentLang === 'en' ? '100-12' : '滿100減12';
             o.selected = true;
             amountSelect.appendChild(o);
             amountSelect.disabled = true;
         } else {
             const o = document.createElement('option');
             o.value = 0;
-            o.textContent = '禮品（非現金）';
+            o.textContent = currentLang === 'en' ? 'Gift' : (currentLang === 'zh-CN' ? '礼品（非现金）' : '禮品（非現金）');
             o.selected = true;
             amountSelect.appendChild(o);
             amountSelect.disabled = true;
@@ -1228,10 +1522,13 @@
 
     function initWalletOptions() {
         const sel = document.getElementById('walletSelect');
-        sel.innerHTML = '<option value="">-- 請選擇錢包 --</option>';
-        WALLETS.forEach(w => {
+        sel.innerHTML = `<option value="">${t('walletPlaceholder')}</option>`;
+        const walletNames = getWalletNames();
+        const originalNames = WALLET_NAMES['zh-HK'];
+        walletNames.forEach((w, idx) => {
             const o = document.createElement('option');
-            o.value = w;
+            // value 永遠用原始（zh-HK）名稱，方便內部儲存統一
+            o.value = originalNames[idx] || w;
             o.textContent = w;
             sel.appendChild(o);
         });
@@ -1239,17 +1536,17 @@
 
     function addVoucher() {
         const weekKey = document.getElementById('weekSelectAdd').value;
-        if (!weekKey) { alert('請選擇領券週次'); return; }
+        if (!weekKey) { alert(t('alertSelectWeek')); return; }
 
         const couponType = document.getElementById('couponTypeSelect').value;
         let amount = parseFloat(document.getElementById('voucherAmountSelect').value);
         if (couponType !== 'gift' && (isNaN(amount) || amount <= 0)) {
-            alert('請選擇有效面額'); return;
+            alert(t('alertSelectAmount')); return;
         }
         if (couponType === 'gift') amount = 0;
 
         const wallet = document.getElementById('walletSelect').value;
-        if (!wallet) { alert('請選擇電子錢包'); return; }
+        if (!wallet) { alert(t('alertSelectWallet')); return; }
 
         const newVoucher = {
             displayId: getNewDisplayId(),
@@ -1266,7 +1563,6 @@
         vouchers.push(newVoucher);
         reassignDisplayIds();
         saveToLocalStorage();
-        // 新增後若不在當前顯示週次，自動切換到該週
         currentViewWeekKey = weekKey;
         renderAll();
         closeOverlay('addOverlay');
@@ -1278,32 +1574,53 @@
         if (!v) return;
         currentDetailId = displayId;
 
-        const typeInfo = getCouponTypeInfo(v.couponType);
+        const labels = COUPON_TYPE_LABELS[currentLang] || COUPON_TYPE_LABELS['zh-HK'];
         const amountEl = document.getElementById('detailAmount');
         if (v.couponType === 'gift') {
-            amountEl.textContent = '禮品';
+            amountEl.textContent = getShortTypeLabel('gift');
             amountEl.className = 'big gift';
         } else if (v.couponType === 'merchant_discount') {
-            amountEl.textContent = '滿100減12';
+            amountEl.textContent = getShortTypeLabel('merchant_discount');
             amountEl.className = 'big merchant';
         } else {
             amountEl.innerHTML = `$${v.amount}<small>MOP</small>`;
             amountEl.className = 'big';
         }
 
-        document.getElementById('detailType').textContent = typeInfo.label;
-        document.getElementById('detailWeek').textContent = getWeekLabelByKey(v.weekKey);
-        document.getElementById('detailWallet').textContent = v.wallet;
-        document.getElementById('detailMinSpend').textContent = getMinSpendDisplay(v);
+        document.getElementById('detailType').textContent = labels[v.couponType] || labels.gov;
 
-        // 狀態：未使用 / 已使用 / 已過期
+        // 錢包：把原始名稱映射為當前語言
+        const originalNames = WALLET_NAMES['zh-HK'];
+        const walletNames = getWalletNames();
+        const idx = originalNames.indexOf(v.wallet);
+        const displayWallet = idx >= 0 ? walletNames[idx] : v.wallet;
+        document.getElementById('detailWallet').textContent = displayWallet;
+
+        document.getElementById('detailWeek').textContent = getWeekLabelByKey(v.weekKey);
+
+        // 最低消費額
+        let minSpendText = '';
+        if (v.couponType === 'gift') minSpendText = '—';
+        else if (v.couponType === 'merchant_discount') minSpendText = '100 MOP';
+        else minSpendText = (v.amount * 3) + ' MOP';
+        document.getElementById('detailMinSpend').textContent = minSpendText;
+
+        // 核銷截止日
+        const wk = weeksData.find(w => w.key === v.weekKey);
+        if (wk && wk.redeemDeadline) {
+            document.getElementById('detailDeadline').textContent = formatDate(wk.redeemDeadline);
+        } else {
+            document.getElementById('detailDeadline').textContent = '—';
+        }
+
+        // 狀態
         const expired = isExpired(v);
-        let statusText = '未使用';
-        if (v.used) statusText = '已使用';
-        else if (expired) statusText = '已過期（逾期作廢）';
+        let statusText = t('statusUnused');
+        if (v.used) statusText = t('statusUsed');
+        else if (expired) statusText = t('statusExpiredLong');
         document.getElementById('detailStatus').textContent = statusText;
 
-        document.getElementById('detailNote').textContent = v.note || '（無）';
+        document.getElementById('detailNote').textContent = v.note || t('noteEmpty');
 
         const useBtn = document.getElementById('detailUseBtn');
         useBtn.style.display = (v.used || expired) ? 'none' : 'block';
@@ -1314,9 +1631,9 @@
     function markCurrentAsUsed() {
         const v = vouchers.find(x => x.displayId === currentDetailId);
         if (!v) return;
-        if (v.used) { alert('已經使用過'); return; }
-        if (isExpired(v)) { alert('此券已過期，無法使用'); return; }
-        if (!confirm(`確定標記 ID ${String(v.displayId).padStart(4,'0')} 為已使用？`)) return;
+        if (v.used) { alert(t('alertAlreadyUsed')); return; }
+        if (isExpired(v)) { alert(t('alertExpired')); return; }
+        if (!confirm(t('confirmUse'))) return;
         v.used = true;
         v.usedTimestamp = new Date().toISOString();
         saveToLocalStorage();
@@ -1327,7 +1644,7 @@
     function deleteCurrent() {
         const v = vouchers.find(x => x.displayId === currentDetailId);
         if (!v) return;
-        if (!confirm(`確定刪除 ID ${String(v.displayId).padStart(4,'0')}？此操作無法復原。`)) return;
+        if (!confirm(t('confirmDelete'))) return;
         vouchers = vouchers.filter(x => x.displayId !== currentDetailId);
         reassignDisplayIds();
         saveToLocalStorage();
@@ -1392,7 +1709,7 @@
             try {
                 const imported = JSON.parse(e.target.result);
                 if (!imported.vouchers || !Array.isArray(imported.vouchers)) {
-                    alert('檔案格式不正確');
+                    alert(t('alertImportFormat'));
                     return;
                 }
                 vouchers = imported.vouchers.map(v => ({
@@ -1412,21 +1729,35 @@
                 saveToLocalStorage();
                 renderAll();
                 closeOverlay('settingsOverlay');
-                alert(`匯入成功，共 ${vouchers.length} 筆記錄`);
+                alert(t('alertImportSuccess', { n: vouchers.length }));
             } catch(err) {
-                alert('匯入失敗，JSON解析錯誤');
+                alert(t('alertImportFail'));
             }
         };
         reader.readAsText(file);
     }
 
     function resetAll() {
-        if (!confirm('⚠️ 確定要重置所有資料嗎？此操作無法復原。')) return;
+        if (!confirm(t('confirmReset'))) return;
         vouchers = [];
         reassignDisplayIds();
         saveToLocalStorage();
         renderAll();
         closeOverlay('settingsOverlay');
+    }
+
+    /* ===== 語言切換 ===== */
+    function switchLang(lang) {
+        if (!I18N[lang]) return;
+        currentLang = lang;
+        saveLang();
+        applyI18n();
+        // 需要重建下拉（因為選項文字和錢包名稱都要換）
+        initWalletOptions();
+        updateAmountOptionsByType();
+        refreshWeekViewSelect();
+        refreshWeekSelect();
+        renderAll();
     }
 
     /* ===== 綁定事件 ===== */
@@ -1457,7 +1788,7 @@
 
         document.getElementById('saveDataBtn').addEventListener('click', () => {
             saveToLocalStorage();
-            alert('已儲存');
+            alert(t('alertSaved'));
         });
         document.getElementById('exportDataBtn').addEventListener('click', exportData);
         document.getElementById('importDataBtn').addEventListener('click', () => {
@@ -1468,15 +1799,23 @@
             e.target.value = '';
         });
         document.getElementById('resetDataBtn').addEventListener('click', resetAll);
+
+        // 語言按鈕
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchLang(btn.dataset.lang));
+        });
     }
 
     /* ===== 初始化 ===== */
     function init() {
         weeksData = generateWeeksList();
+        loadLang();
+        applyI18n();
         initWalletOptions();
         updateAmountOptionsByType();
         bindEvents();
         loadFromLocalStorage();
+        refreshWeekSelect();
         renderAll();
     }
 
