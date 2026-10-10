@@ -320,7 +320,6 @@
             font-weight: 600;
         }
 
-        /* 剩餘天數提示 */
         .days-remaining {
             margin-top: 12px;
             text-align: center;
@@ -599,7 +598,6 @@
             background: #fdf0ed;
         }
 
-        /* 語言切換器 */
         .lang-switcher {
             display: flex;
             gap: 8px;
@@ -664,18 +662,24 @@
 
         .wallet-avatar[data-wallet="MPay"] { background: #e83f3f; }
         .wallet-avatar[data-wallet="支付寶（澳門）"],
-        .wallet-avatar[data-wallet="支付宝（澳门）"] { background: #1677ff; }
+        .wallet-avatar[data-wallet="支付宝（澳门）"],
+        .wallet-avatar[data-wallet="Alipay (Macau)"] { background: #1677ff; }
         .wallet-avatar[data-wallet="澳門中銀手機銀行"],
-        .wallet-avatar[data-wallet="澳门中银手机银行"] { background: #c8102e; }
+        .wallet-avatar[data-wallet="澳门中银手机银行"],
+        .wallet-avatar[data-wallet="BOC Macau"] { background: #c8102e; }
         .wallet-avatar[data-wallet="工銀e支付"],
-        .wallet-avatar[data-wallet="工银e支付"] { background: #b41f24; }
+        .wallet-avatar[data-wallet="工银e支付"],
+        .wallet-avatar[data-wallet="ICBC e-Pay"] { background: #b41f24; }
         .wallet-avatar[data-wallet="豐付寶"],
-        .wallet-avatar[data-wallet="丰付宝"] { background: #00693e; }
+        .wallet-avatar[data-wallet="丰付宝"],
+        .wallet-avatar[data-wallet="Fung Fu Bao"] { background: #00693e; }
         .wallet-avatar[data-wallet="廣發移動支付錢包"],
-        .wallet-avatar[data-wallet="广发移动支付钱包"] { background: #c8102e; }
+        .wallet-avatar[data-wallet="广发移动支付钱包"],
+        .wallet-avatar[data-wallet="CGB Mobile Wallet"] { background: #c8102e; }
         .wallet-avatar[data-wallet="LusoPay"] { background: #e30613; }
         .wallet-avatar[data-wallet="極易付（UePay）"],
-        .wallet-avatar[data-wallet="极易付（UePay）"] { background: #1e5f9e; }
+        .wallet-avatar[data-wallet="极易付（UePay）"],
+        .wallet-avatar[data-wallet="UePay"] { background: #1e5f9e; }
     </style>
 </head>
 <body>
@@ -721,7 +725,6 @@
 
 <button class="fab" id="fabAddBtn" title="新增優惠券">+</button>
 
-<!-- 新增彈窗 -->
 <div class="overlay" id="addOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
@@ -757,7 +760,6 @@
     </div>
 </div>
 
-<!-- 詳情彈窗 -->
 <div class="overlay" id="detailOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
@@ -805,7 +807,6 @@
     </div>
 </div>
 
-<!-- 備註編輯 -->
 <div class="overlay" id="noteOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
@@ -819,7 +820,6 @@
     </div>
 </div>
 
-<!-- 設定彈窗 -->
 <div class="overlay" id="settingsOverlay">
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
@@ -852,6 +852,16 @@
         <div class="settings-note">
             <span class="icon">🔒</span>
             <span data-i18n="privacyNote">隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。</span>
+        </div>
+
+        <!-- 訪問計數：不參與 i18n，永遠保持原生 -->
+        <div class="settings-note" style="margin-top:8px;">
+            <span class="icon">👀</span>
+            <span>
+                <span data-i18n="visitsLabel">總訪問次數</span>：<strong id="vercount_value_page_pv">—</strong>
+                &nbsp;
+                <span data-i18n="visitorsLabel">訪客人數</span>：<strong id="vercount_value_page_uv">—</strong>
+            </span>
         </div>
     </div>
 </div>
@@ -905,6 +915,8 @@
             btnImport: '匯入資料 (JSON)',
             btnReset: '重置所有數據',
             privacyNote: '隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。',
+            visitsLabel: '總訪問次數',
+            visitorsLabel: '訪客人數',
             alertSelectWeek: '請選擇領券週次',
             alertSelectAmount: '請選擇有效面額',
             alertSelectWallet: '請選擇電子錢包',
@@ -921,8 +933,7 @@
             weekLabelSuffix: '週',
             daysRemaining: '距核銷截止：剩 {n} 日',
             daysRemainingExpired: '核銷期已過',
-            daysRemainingToday: '今日為核銷最後一日',
-            alertNoData: '沒有資料可匯出'
+            daysRemainingToday: '今日為核銷最後一日'
         },
         'zh-CN': {
             appTitle: '优惠券管理器',
@@ -970,6 +981,8 @@
             btnImport: '导入数据 (JSON)',
             btnReset: '重置所有数据',
             privacyNote: '隐私保障：所有数据仅存储于您的浏览器本地，绝不上传云端。',
+            visitsLabel: '总访问次数',
+            visitorsLabel: '访客人数',
             alertSelectWeek: '请选择领券周次',
             alertSelectAmount: '请选择有效面额',
             alertSelectWallet: '请选择电子钱包',
@@ -986,8 +999,7 @@
             weekLabelSuffix: '周',
             daysRemaining: '距核销截止：剩 {n} 日',
             daysRemainingExpired: '核销期已过',
-            daysRemainingToday: '今日为核销最后一日',
-            alertNoData: '没有数据可导出'
+            daysRemainingToday: '今日为核销最后一日'
         },
         'en': {
             appTitle: 'Coupon Manager',
@@ -998,7 +1010,7 @@
             statRemaining: 'Unused Amount',
             statAvailable: 'Available Discount',
             myCoupons: 'My Coupons',
-            countUnit: '',
+            countUnit: '',  // 英文不加量詞
             emptyTitle: 'No coupons recorded for this week',
             emptyHint: 'Tap "+" at bottom-right to add',
             addTitle: '➕ Add Coupon',
@@ -1035,6 +1047,8 @@
             btnImport: 'Import Data (JSON)',
             btnReset: 'Reset All Data',
             privacyNote: 'Privacy: All data is stored locally in your browser only.',
+            visitsLabel: 'Page Views',
+            visitorsLabel: 'Visitors',
             alertSelectWeek: 'Please select week',
             alertSelectAmount: 'Please select valid amount',
             alertSelectWallet: 'Please select wallet',
@@ -1048,22 +1062,21 @@
             alertImportFormat: 'Invalid file format',
             confirmReset: '⚠️ Reset all data? This cannot be undone.',
             weekLabelPrefix: 'Week ',
-            weekLabelSuffix: '',
+            weekLabelSuffix: '',  // 英文不加後綴
             daysRemaining: 'Redeem within {n} day(s)',
             daysRemainingExpired: 'Redemption period over',
-            daysRemainingToday: 'Last day to redeem',
-            alertNoData: 'No data to export'
+            daysRemainingToday: 'Last day to redeem'
         }
     };
 
-    /* ===== 各語言對應的錢包顯示名稱 ===== */
+    /* ===== 錢包名稱（各語言） ===== */
     const WALLET_NAMES = {
         'zh-HK': ["MPay", "支付寶（澳門）", "澳門中銀手機銀行", "工銀e支付", "豐付寶", "廣發移動支付錢包", "LusoPay", "極易付（UePay）"],
         'zh-CN': ["MPay", "支付宝（澳门）", "澳门中银手机银行", "工银e支付", "丰付宝", "广发移动支付钱包", "LusoPay", "极易付（UePay）"],
         'en':    ["MPay", "Alipay (Macau)", "BOC Macau", "ICBC e-Pay", "Fung Fu Bao", "CGB Mobile Wallet", "LusoPay", "UePay"]
     };
 
-    /* ===== 各語言對應的券種顯示名稱 ===== */
+    /* ===== 券種顯示名稱 ===== */
     const COUPON_TYPE_LABELS = {
         'zh-HK': { gov: '政府電子優惠券', merchant_discount: '商戶滿減券', gift: '消費禮遇券' },
         'zh-CN': { gov: '政府电子优惠券', merchant_discount: '商户满减券', gift: '消费礼遇券' },
@@ -1078,11 +1091,26 @@
 
     let currentLang = 'zh-HK';
 
+    /**
+     * 修正 t() 函式：
+     * - 若該語言有定義該 key（即使值是空字串），就回傳該值
+     * - 只有當該 key 在該語言「完全不存在」時，才 fallback 到 zh-HK
+     * 這樣英文的 weekLabelSuffix: '' 與 countUnit: '' 才能正確顯示為空字串
+     */
     function t(key, params) {
-        let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N['zh-HK'][key] || key;
+        const langDict = I18N[currentLang] || {};
+        const fallbackDict = I18N['zh-HK'];
+        let str;
+        if (Object.prototype.hasOwnProperty.call(langDict, key)) {
+            str = langDict[key];
+        } else if (Object.prototype.hasOwnProperty.call(fallbackDict, key)) {
+            str = fallbackDict[key];
+        } else {
+            str = key;
+        }
         if (params) {
             Object.keys(params).forEach(k => {
-                str = str.replace('{' + k + '}', params[k]);
+                str = String(str).replace('{' + k + '}', params[k]);
             });
         }
         return str;
@@ -1092,7 +1120,7 @@
         return WALLET_NAMES[currentLang] || WALLET_NAMES['zh-HK'];
     }
 
-    /* ===== 券種設定（內部鍵值固定，不受語言影響） ===== */
+    /* ===== 券種設定 ===== */
     const COUPON_TYPES = {
         gov: { defaultAmount: 50, minSpendMultiplier: 3 },
         merchant_discount: { defaultAmount: 12, minSpendMultiplier: 0, fixedMinSpend: 100 },
@@ -1142,12 +1170,19 @@
     function formatShortDate(d) {
         return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
     }
+    /**
+     * 取得週次短標籤（不顯示年份）
+     * 中文：第X週 (MM/DD ~ MM/DD)
+     * 英文：Week X (MM/DD ~ MM/DD)
+     */
     function getWeekShortLabel(wk) {
-        return `${t('weekLabelPrefix')}${wk.index}${t('weekLabelSuffix')} (${formatShortDate(wk.friday)} ~ ${formatShortDate(wk.sunday)})`;
+        const prefix = t('weekLabelPrefix');
+        const suffix = t('weekLabelSuffix');
+        return `${prefix}${wk.index}${suffix} (${formatShortDate(wk.friday)} ~ ${formatShortDate(wk.sunday)})`;
     }
     function getWeekFullLabel(wk) {
         if (!wk) return '';
-        return `${t('weekLabelPrefix')}${wk.index}${t('weekLabelSuffix')} (${formatShortDate(wk.friday)} ~ ${formatShortDate(wk.sunday)})`;
+        return getWeekShortLabel(wk);
     }
     function getWeekLabelByKey(key) {
         const wk = weeksData.find(w => w.key === key);
@@ -1179,16 +1214,6 @@
         today.setHours(0, 0, 0, 0);
         return today > wk.redeemDeadline;
     }
-    function getDaysRemaining(voucher) {
-        const wk = weeksData.find(w => w.key === voucher.weekKey);
-        if (!wk || !wk.redeemDeadline) return null;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const deadline = new Date(wk.redeemDeadline);
-        deadline.setHours(0, 0, 0, 0);
-        const diff = Math.round((deadline - today) / (1000 * 60 * 60 * 24));
-        return diff; // >0 剩 n 日, 0 今天, <0 已過期
-    }
 
     /* ===== 資料 ===== */
     function reassignDisplayIds() {
@@ -1206,7 +1231,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             vouchers: vouchers,
             nextDisplayId: nextDisplayId,
-            version: '4.2',
+            version: '4.3',
             activity: '2026社區消費連環賞',
             lastUpdated: new Date().toISOString()
         }));
@@ -1255,7 +1280,6 @@
         document.querySelectorAll('[data-i18n-ph]').forEach(el => {
             el.placeholder = t(el.dataset.i18nPh);
         });
-        // 更新語言按鈕狀態
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.lang === currentLang);
         });
@@ -1306,20 +1330,22 @@
                     <p>${t('emptyTitle')}</p>
                     <p style="margin-top:6px;font-size:0.78rem;">${t('emptyHint')}</p>
                 </div>`;
-            document.getElementById('totalCount').textContent = `0 ${t('countUnit')}`.trim();
+            // 英文 countUnit 為空字串，不加空格
+            const unit = t('countUnit');
+            document.getElementById('totalCount').textContent = unit ? `0 ${unit}` : '0';
             return;
         }
 
-        document.getElementById('totalCount').textContent = `${weekVouchers.length} ${t('countUnit')}`.trim();
+        const unit = t('countUnit');
+        document.getElementById('totalCount').textContent = unit ? `${weekVouchers.length} ${unit}` : `${weekVouchers.length}`;
 
         const walletNames = getWalletNames();
         const groups = {};
         walletNames.forEach(w => { groups[w] = []; });
 
-        // 把券按當前語言的錢包名稱分組
-        // 資料中的 wallet 儲存的是「原始」名稱（zh-HK），需要映射
-        const originalToLocal = {};
+        // 資料儲存的是 zh-HK 原始名稱，需映射為當前語言
         const originalNames = WALLET_NAMES['zh-HK'];
+        const originalToLocal = {};
         walletNames.forEach((localName, idx) => {
             originalToLocal[originalNames[idx]] = localName;
         });
@@ -1378,7 +1404,7 @@
             html += `</div></div>`;
         });
 
-        // 剩餘天數提示（只顯示當前選中的週次，且該週有券）
+        // 剩餘天數提示（只顯示所選週次）
         const wk = weeksData.find(w => w.key === targetWeek);
         if (wk && wk.redeemDeadline) {
             const today = new Date();
@@ -1412,7 +1438,6 @@
     }
 
     function getShortTypeLabel(type) {
-        const labels = COUPON_TYPE_LABELS[currentLang] || COUPON_TYPE_LABELS['zh-HK'];
         if (type === 'gift') {
             return currentLang === 'en' ? 'Gift' : (currentLang === 'zh-CN' ? '礼品' : '禮品');
         }
@@ -1589,7 +1614,6 @@
 
         document.getElementById('detailType').textContent = labels[v.couponType] || labels.gov;
 
-        // 錢包：把原始名稱映射為當前語言
         const originalNames = WALLET_NAMES['zh-HK'];
         const walletNames = getWalletNames();
         const idx = originalNames.indexOf(v.wallet);
@@ -1598,14 +1622,12 @@
 
         document.getElementById('detailWeek').textContent = getWeekLabelByKey(v.weekKey);
 
-        // 最低消費額
         let minSpendText = '';
         if (v.couponType === 'gift') minSpendText = '—';
         else if (v.couponType === 'merchant_discount') minSpendText = '100 MOP';
         else minSpendText = (v.amount * 3) + ' MOP';
         document.getElementById('detailMinSpend').textContent = minSpendText;
 
-        // 核銷截止日
         const wk = weeksData.find(w => w.key === v.weekKey);
         if (wk && wk.redeemDeadline) {
             document.getElementById('detailDeadline').textContent = formatDate(wk.redeemDeadline);
@@ -1613,7 +1635,6 @@
             document.getElementById('detailDeadline').textContent = '—';
         }
 
-        // 狀態
         const expired = isExpired(v);
         let statusText = t('statusUnused');
         if (v.used) statusText = t('statusUsed');
@@ -1752,7 +1773,6 @@
         currentLang = lang;
         saveLang();
         applyI18n();
-        // 需要重建下拉（因為選項文字和錢包名稱都要換）
         initWalletOptions();
         updateAmountOptionsByType();
         refreshWeekViewSelect();
@@ -1800,7 +1820,6 @@
         });
         document.getElementById('resetDataBtn').addEventListener('click', resetAll);
 
-        // 語言按鈕
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', () => switchLang(btn.dataset.lang));
         });
