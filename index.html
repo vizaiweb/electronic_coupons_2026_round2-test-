@@ -119,7 +119,6 @@
             border-radius: 20px;
             padding: 14px 16px;
             box-shadow: 0 2px 8px rgba(30, 95, 158, 0.06);
-            position: relative;
         }
         .stat-card.blue {
             background: linear-gradient(135deg, #e8f1fb, #dbe9f9);
@@ -163,17 +162,44 @@
             justify-content: space-between;
             margin-bottom: 12px;
             padding: 0 4px;
+            gap: 8px;
         }
         .section-title h2 {
             margin: 0;
             font-size: 0.95rem;
             font-weight: 700;
             color: #1a2f4a;
+            white-space: nowrap;
+        }
+        .section-title .right-part {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+            min-width: 0;
         }
         .section-title .count {
             font-size: 0.8rem;
             color: #7b8a9e;
             font-weight: 500;
+            white-space: nowrap;
+        }
+        .week-view-select {
+            padding: 6px 10px;
+            border: 1.5px solid #d6e3f2;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            background: #ffffff;
+            color: #1a2f4a;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            max-width: 180px;
+            font-family: inherit;
+        }
+        .week-view-select:focus {
+            border-color: #1e5f9e;
         }
 
         /* ===== 錢包分組卡片 ===== */
@@ -244,6 +270,11 @@
             border-color: #e2e6ec;
             opacity: 0.65;
         }
+        .voucher-card.expired {
+            background: #fdf0ed;
+            border-color: #f5c9c0;
+            opacity: 0.85;
+        }
         .voucher-card.merchant {
             background: #fff8ee;
             border-color: #ffddb0;
@@ -261,6 +292,9 @@
         }
         .voucher-card.used .v-amount {
             color: #98a4b3;
+        }
+        .voucher-card.expired .v-amount {
+            color: #c94a2c;
         }
         .voucher-card.merchant .v-amount {
             color: #b35c00;
@@ -283,6 +317,9 @@
         }
         .voucher-card.used .v-status {
             color: #98a4b3;
+        }
+        .voucher-card.expired .v-status {
+            color: #c94a2c;
         }
         .voucher-card .v-id {
             position: absolute;
@@ -646,7 +683,10 @@
     <!-- 記錄區域 -->
     <div class="section-title">
         <h2>我的優惠券</h2>
-        <span class="count" id="totalCount">0 張</span>
+        <div class="right-part">
+            <select id="weekViewSelect" class="week-view-select"></select>
+            <span class="count" id="totalCount">0 張</span>
+        </div>
     </div>
     <div id="voucherList"></div>
 
@@ -853,6 +893,7 @@
     let weeksData = [];
     let nextDisplayId = 1;
     let currentDetailId = null;
+    let currentViewWeekKey = '';   // 目前顯示的週次
 
     /* ===== 週次生成 ===== */
     function generateWeeksList() {
@@ -908,6 +949,16 @@
         return weeksData[0]?.key || '';
     }
 
+    /* ===== 過期判斷 ===== */
+    function isExpired(voucher) {
+        if (voucher.used) return false;
+        const wk = weeksData.find(w => w.key === voucher.weekKey);
+        if (!wk || !wk.redeemDeadline) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today > wk.redeemDeadline;
+    }
+
     /* ===== 資料 ===== */
     function reassignDisplayIds() {
         const sorted = [...vouchers].sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -924,7 +975,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             vouchers: vouchers,
             nextDisplayId: nextDisplayId,
-            version: '4.0',
+            version: '4.1',
             activity: '2026社區消費連環賞',
             lastUpdated: new Date().toISOString()
         }));
@@ -974,56 +1025,45 @@
     }
 
     function renderStats() {
-        const now = new Date();
-        now.setHours(0,0,0,0);
-        let thisWeekKey = '';
-        for (let wk of weeksData) {
-            if (now >= wk.friday && now <= wk.sunday) {
-                thisWeekKey = wk.key;
-                break;
-            }
-        }
-        if (!thisWeekKey) {
-            // 週一~週四，找上一個過去的週
-            const candidates = weeksData.filter(wk => wk.sunday < now);
-            if (candidates.length > 0) thisWeekKey = candidates[candidates.length-1].key;
-        }
-
+        const weekKey = currentViewWeekKey || getDefaultWeekKey();
         let remaining = 0;
         let available = 0;
-
-        if (thisWeekKey) {
+        if (weekKey) {
             vouchers.forEach(v => {
-                if (v.weekKey === thisWeekKey && (v.couponType || 'gov') === 'gov' && !v.used) {
+                if (v.weekKey === weekKey && (v.couponType || 'gov') === 'gov' && !v.used && !isExpired(v)) {
                     remaining += v.amount;
                     available += v.amount * 3;
                 }
             });
         }
-
         document.getElementById('statRemaining').textContent = remaining.toFixed(0);
         document.getElementById('statAvailable').textContent = available.toFixed(0);
     }
 
     function renderVouchers() {
         const container = document.getElementById('voucherList');
-        if (vouchers.length === 0) {
+        const targetWeek = currentViewWeekKey || getDefaultWeekKey();
+
+        // 只取所選週次的券
+        const weekVouchers = vouchers.filter(v => v.weekKey === targetWeek);
+
+        if (weekVouchers.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <span class="emoji">🎫</span>
-                    <p>還沒有任何優惠券記錄</p>
+                    <p>此週還沒有任何優惠券記錄</p>
                     <p style="margin-top:6px;font-size:0.78rem;">點擊右下角「+」按鈕新增</p>
                 </div>`;
             document.getElementById('totalCount').textContent = '0 張';
             return;
         }
 
-        document.getElementById('totalCount').textContent = vouchers.length + ' 張';
+        document.getElementById('totalCount').textContent = weekVouchers.length + ' 張';
 
         // 按錢包分組
         const groups = {};
         WALLETS.forEach(w => { groups[w] = []; });
-        vouchers.forEach(v => {
+        weekVouchers.forEach(v => {
             const w = v.wallet || WALLETS[0];
             if (!groups[w]) groups[w] = [];
             groups[w].push(v);
@@ -1044,16 +1084,16 @@
                     </div>
                     <div class="voucher-grid">`;
 
-            // 未使用的排在前面
             const sorted = [...list].sort((a,b) => {
                 if (a.used !== b.used) return a.used ? 1 : -1;
                 return a.displayId - b.displayId;
             });
 
             sorted.forEach(v => {
-                const typeInfo = getCouponTypeInfo(v.couponType);
+                const expired = isExpired(v);
                 const typeClass = v.couponType === 'merchant_discount' ? 'merchant'
                                 : v.couponType === 'gift' ? 'gift' : '';
+                const stateClass = v.used ? 'used' : (expired ? 'expired' : '');
                 let amountHtml = '';
                 if (v.couponType === 'gift') {
                     amountHtml = `<div class="v-amount">禮品</div>`;
@@ -1062,9 +1102,12 @@
                 } else {
                     amountHtml = `<div class="v-amount">$${v.amount}</div>`;
                 }
-                const statusText = v.used ? '已使用' : '未使用';
+                let statusText = '未使用';
+                if (v.used) statusText = '已使用';
+                else if (expired) statusText = '已過期';
+
                 html += `
-                    <div class="voucher-card ${typeClass} ${v.used ? 'used' : ''}" data-id="${v.displayId}">
+                    <div class="voucher-card ${typeClass} ${stateClass}" data-id="${v.displayId}">
                         <div class="v-id">#${String(v.displayId).padStart(3,'0')}</div>
                         ${amountHtml}
                         <div class="v-status">${statusText}</div>
@@ -1076,7 +1119,6 @@
 
         container.innerHTML = html;
 
-        // 綁定點擊
         container.querySelectorAll('.voucher-card').forEach(card => {
             card.addEventListener('click', () => {
                 const id = parseInt(card.dataset.id);
@@ -1105,11 +1147,33 @@
         return escapeHtml(s).replace(/"/g, '&quot;');
     }
 
+    /* ===== 週次顯示下拉 ===== */
+    function refreshWeekViewSelect() {
+        const sel = document.getElementById('weekViewSelect');
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = '';
+        weeksData.forEach(wk => {
+            const opt = document.createElement('option');
+            opt.value = wk.key;
+            opt.textContent = wk.label;
+            sel.appendChild(opt);
+        });
+        if (prev && weeksData.some(w => w.key === prev)) {
+            sel.value = prev;
+            currentViewWeekKey = prev;
+        } else {
+            const def = getDefaultWeekKey() || weeksData[0]?.key || '';
+            sel.value = def;
+            currentViewWeekKey = def;
+        }
+    }
+
     function renderAll() {
         renderActivityStatus();
+        refreshWeekViewSelect();
         renderStats();
         renderVouchers();
-        refreshWeekSelect();
     }
 
     /* ===== 新增表單 ===== */
@@ -1202,6 +1266,8 @@
         vouchers.push(newVoucher);
         reassignDisplayIds();
         saveToLocalStorage();
+        // 新增後若不在當前顯示週次，自動切換到該週
+        currentViewWeekKey = weekKey;
         renderAll();
         closeOverlay('addOverlay');
     }
@@ -1229,11 +1295,18 @@
         document.getElementById('detailWeek').textContent = getWeekLabelByKey(v.weekKey);
         document.getElementById('detailWallet').textContent = v.wallet;
         document.getElementById('detailMinSpend').textContent = getMinSpendDisplay(v);
-        document.getElementById('detailStatus').textContent = v.used ? '已使用' : '未使用';
+
+        // 狀態：未使用 / 已使用 / 已過期
+        const expired = isExpired(v);
+        let statusText = '未使用';
+        if (v.used) statusText = '已使用';
+        else if (expired) statusText = '已過期（逾期作廢）';
+        document.getElementById('detailStatus').textContent = statusText;
+
         document.getElementById('detailNote').textContent = v.note || '（無）';
 
         const useBtn = document.getElementById('detailUseBtn');
-        useBtn.style.display = v.used ? 'none' : 'block';
+        useBtn.style.display = (v.used || expired) ? 'none' : 'block';
 
         document.getElementById('detailOverlay').classList.add('open');
     }
@@ -1242,6 +1315,7 @@
         const v = vouchers.find(x => x.displayId === currentDetailId);
         if (!v) return;
         if (v.used) { alert('已經使用過'); return; }
+        if (isExpired(v)) { alert('此券已過期，無法使用'); return; }
         if (!confirm(`確定標記 ID ${String(v.displayId).padStart(4,'0')} 為已使用？`)) return;
         v.used = true;
         v.usedTimestamp = new Date().toISOString();
@@ -1283,9 +1357,6 @@
     /* ===== 彈窗控制 ===== */
     function closeOverlay(id) {
         document.getElementById(id).classList.remove('open');
-    }
-    function closeAllOverlays() {
-        document.querySelectorAll('.overlay').forEach(el => el.classList.remove('open'));
     }
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', () => closeOverlay(btn.dataset.close));
@@ -1361,6 +1432,7 @@
     /* ===== 綁定事件 ===== */
     function bindEvents() {
         document.getElementById('fabAddBtn').addEventListener('click', () => {
+            refreshWeekSelect();
             document.getElementById('addOverlay').classList.add('open');
         });
 
@@ -1370,6 +1442,12 @@
 
         document.getElementById('couponTypeSelect').addEventListener('change', updateAmountOptionsByType);
         document.getElementById('addVoucherBtn').addEventListener('click', addVoucher);
+
+        document.getElementById('weekViewSelect').addEventListener('change', (e) => {
+            currentViewWeekKey = e.target.value;
+            renderStats();
+            renderVouchers();
+        });
 
         document.getElementById('detailUseBtn').addEventListener('click', markCurrentAsUsed);
         document.getElementById('detailDeleteBtn').addEventListener('click', deleteCurrent);
