@@ -501,6 +501,24 @@
             box-shadow: 0 4px 12px rgba(231, 111, 81, 0.35);
         }
 
+        /* 累計新增提示 */
+        .session-added {
+            display: none;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e7a3f;
+            background: #e6f4ea;
+            border: 1px solid #c2e0cd;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .session-added.show {
+            display: block;
+        }
+
         .detail-amount {
             text-align: center;
             padding: 16px 0 8px;
@@ -729,7 +747,7 @@
     <div class="sheet" onclick="event.stopPropagation()">
         <div class="sheet-header">
             <h3 data-i18n="addTitle">➕ 新增優惠券</h3>
-            <button class="close-btn" data-close="addOverlay">✕</button>
+            <button class="close-btn" id="closeAddBtn">✕</button>
         </div>
 
         <div class="field">
@@ -754,6 +772,10 @@
         <div class="field">
             <label data-i18n="labelWallet">👛 電子錢包</label>
             <select id="walletSelect"></select>
+        </div>
+
+        <div class="session-added" id="sessionAdded">
+            <span data-i18n="sessionAddedLabel">累計新增</span>：<strong id="sessionAddedNum">0</strong> <span data-i18n="sessionAddedUnit">張</span>
         </div>
 
         <button class="submit-btn" id="addVoucherBtn" data-i18n="btnConfirmAdd">確認新增</button>
@@ -854,7 +876,6 @@
             <span data-i18n="privacyNote">隱私保障：所有資料僅儲存於您的瀏覽器本地，絕不上傳雲端。</span>
         </div>
 
-        <!-- 訪問計數：不參與 i18n，永遠保持原生 -->
         <div class="settings-note" style="margin-top:8px;">
             <span class="icon">👀</span>
             <span>
@@ -891,6 +912,8 @@
             typeGift: '消費禮遇券（禮品）',
             walletPlaceholder: '-- 請選擇錢包 --',
             btnConfirmAdd: '確認新增',
+            sessionAddedLabel: '累計新增',
+            sessionAddedUnit: '張',
             detailTitle: '優惠券詳情',
             rowWeek: '📆 歸屬週次',
             rowWallet: '👛 電子錢包',
@@ -957,6 +980,8 @@
             typeGift: '消费礼遇券（礼品）',
             walletPlaceholder: '-- 请选择钱包 --',
             btnConfirmAdd: '确认新增',
+            sessionAddedLabel: '累计新增',
+            sessionAddedUnit: '张',
             detailTitle: '优惠券详情',
             rowWeek: '📆 归属周次',
             rowWallet: '👛 电子钱包',
@@ -1010,7 +1035,7 @@
             statRemaining: 'Unused Amount',
             statAvailable: 'Available Discount',
             myCoupons: 'My Coupons',
-            countUnit: '',  // 英文不加量詞
+            countUnit: '',
             emptyTitle: 'No coupons recorded for this week',
             emptyHint: 'Tap "+" at bottom-right to add',
             addTitle: '➕ Add Coupon',
@@ -1023,6 +1048,8 @@
             typeGift: 'Consumption Gift',
             walletPlaceholder: '-- Select wallet --',
             btnConfirmAdd: 'Confirm',
+            sessionAddedLabel: 'Added',
+            sessionAddedUnit: '',
             detailTitle: 'Coupon Details',
             rowWeek: '📆 Week',
             rowWallet: '👛 E-Wallet',
@@ -1062,7 +1089,7 @@
             alertImportFormat: 'Invalid file format',
             confirmReset: '⚠️ Reset all data? This cannot be undone.',
             weekLabelPrefix: 'Week ',
-            weekLabelSuffix: '',  // 英文不加後綴
+            weekLabelSuffix: '',
             daysRemaining: 'Redeem within {n} day(s)',
             daysRemainingExpired: 'Redemption period over',
             daysRemainingToday: 'Last day to redeem'
@@ -1091,12 +1118,6 @@
 
     let currentLang = 'zh-HK';
 
-    /**
-     * 修正 t() 函式：
-     * - 若該語言有定義該 key（即使值是空字串），就回傳該值
-     * - 只有當該 key 在該語言「完全不存在」時，才 fallback 到 zh-HK
-     * 這樣英文的 weekLabelSuffix: '' 與 countUnit: '' 才能正確顯示為空字串
-     */
     function t(key, params) {
         const langDict = I18N[currentLang] || {};
         const fallbackDict = I18N['zh-HK'];
@@ -1120,7 +1141,6 @@
         return WALLET_NAMES[currentLang] || WALLET_NAMES['zh-HK'];
     }
 
-    /* ===== 券種設定 ===== */
     const COUPON_TYPES = {
         gov: { defaultAmount: 50, minSpendMultiplier: 3 },
         merchant_discount: { defaultAmount: 12, minSpendMultiplier: 0, fixedMinSpend: 100 },
@@ -1133,6 +1153,7 @@
     let nextDisplayId = 1;
     let currentDetailId = null;
     let currentViewWeekKey = '';
+    let sessionAddedCount = 0;
 
     /* ===== 週次 ===== */
     function generateWeeksList() {
@@ -1170,11 +1191,6 @@
     function formatShortDate(d) {
         return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
     }
-    /**
-     * 取得週次短標籤（不顯示年份）
-     * 中文：第X週 (MM/DD ~ MM/DD)
-     * 英文：Week X (MM/DD ~ MM/DD)
-     */
     function getWeekShortLabel(wk) {
         const prefix = t('weekLabelPrefix');
         const suffix = t('weekLabelSuffix');
@@ -1231,7 +1247,7 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
             vouchers: vouchers,
             nextDisplayId: nextDisplayId,
-            version: '4.3',
+            version: '4.4',
             activity: '2026社區消費連環賞',
             lastUpdated: new Date().toISOString()
         }));
@@ -1330,7 +1346,6 @@
                     <p>${t('emptyTitle')}</p>
                     <p style="margin-top:6px;font-size:0.78rem;">${t('emptyHint')}</p>
                 </div>`;
-            // 英文 countUnit 為空字串，不加空格
             const unit = t('countUnit');
             document.getElementById('totalCount').textContent = unit ? `0 ${unit}` : '0';
             return;
@@ -1343,7 +1358,6 @@
         const groups = {};
         walletNames.forEach(w => { groups[w] = []; });
 
-        // 資料儲存的是 zh-HK 原始名稱，需映射為當前語言
         const originalNames = WALLET_NAMES['zh-HK'];
         const originalToLocal = {};
         walletNames.forEach((localName, idx) => {
@@ -1404,7 +1418,6 @@
             html += `</div></div>`;
         });
 
-        // 剩餘天數提示（只顯示所選週次）
         const wk = weeksData.find(w => w.key === targetWeek);
         if (wk && wk.redeemDeadline) {
             const today = new Date();
@@ -1552,11 +1565,28 @@
         const originalNames = WALLET_NAMES['zh-HK'];
         walletNames.forEach((w, idx) => {
             const o = document.createElement('option');
-            // value 永遠用原始（zh-HK）名稱，方便內部儲存統一
             o.value = originalNames[idx] || w;
             o.textContent = w;
             sel.appendChild(o);
         });
+    }
+
+    function updateSessionAddedDisplay() {
+        const el = document.getElementById('sessionAdded');
+        const numEl = document.getElementById('sessionAddedNum');
+        if (!el || !numEl) return;
+        if (sessionAddedCount > 0) {
+            el.classList.add('show');
+            numEl.textContent = sessionAddedCount;
+        } else {
+            el.classList.remove('show');
+            numEl.textContent = 0;
+        }
+    }
+
+    function resetSessionCount() {
+        sessionAddedCount = 0;
+        updateSessionAddedDisplay();
     }
 
     function addVoucher() {
@@ -1588,9 +1618,17 @@
         vouchers.push(newVoucher);
         reassignDisplayIds();
         saveToLocalStorage();
+
+        // 切換主畫面顯示的週次，讓使用者立即看到剛新增的券
         currentViewWeekKey = weekKey;
+
+        // 累計新增計數
+        sessionAddedCount++;
+
+        // 留在彈窗，不關閉
+        // 表單完全保留（不清空）
         renderAll();
-        closeOverlay('addOverlay');
+        updateSessionAddedDisplay();
     }
 
     /* ===== 詳情彈窗 ===== */
@@ -1695,6 +1733,10 @@
     /* ===== 彈窗控制 ===== */
     function closeOverlay(id) {
         document.getElementById(id).classList.remove('open');
+        // 關閉新增彈窗時，計數歸零（下次打開重新計算）
+        if (id === 'addOverlay') {
+            resetSessionCount();
+        }
     }
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', () => closeOverlay(btn.dataset.close));
@@ -1778,6 +1820,7 @@
         refreshWeekViewSelect();
         refreshWeekSelect();
         renderAll();
+        updateSessionAddedDisplay();
     }
 
     /* ===== 綁定事件 ===== */
@@ -1789,6 +1832,11 @@
 
         document.getElementById('settingsBtn').addEventListener('click', () => {
             document.getElementById('settingsOverlay').classList.add('open');
+        });
+
+        // 新增彈窗：X 關閉按鈕（含計數歸零）
+        document.getElementById('closeAddBtn').addEventListener('click', () => {
+            closeOverlay('addOverlay');
         });
 
         document.getElementById('couponTypeSelect').addEventListener('change', updateAmountOptionsByType);
@@ -1836,6 +1884,7 @@
         loadFromLocalStorage();
         refreshWeekSelect();
         renderAll();
+        updateSessionAddedDisplay();
     }
 
     init();
