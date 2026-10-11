@@ -1527,6 +1527,24 @@
         }
     }
 
+    function resetAddForm() {
+    // 1. 領券週：回到「當前所屬週」
+    refreshWeekSelect();
+    const weekSel = document.getElementById('weekSelectAdd');
+    weekSel.value = getDefaultWeekKey() || weeksData[0]?.key || '';
+
+    // 2. 券種：回到「政府電子優惠券」
+    const typeSel = document.getElementById('couponTypeSelect');
+    typeSel.value = 'gov';
+
+    // 3. 面額：依券種重建（政府券預設 50 MOP）
+    updateAmountOptionsByType();
+
+    // 4. 錢包：回到「-- 請選擇錢包 --」
+    const walletSel = document.getElementById('walletSelect');
+    walletSel.value = '';
+}
+    
     function updateAmountOptionsByType() {
         const typeSelect = document.getElementById('couponTypeSelect');
         const amountSelect = document.getElementById('voucherAmountSelect');
@@ -1826,7 +1844,7 @@
     /* ===== 綁定事件 ===== */
     function bindEvents() {
         document.getElementById('fabAddBtn').addEventListener('click', () => {
-            refreshWeekSelect();
+            resetAddForm();
             document.getElementById('addOverlay').classList.add('open');
         });
 
