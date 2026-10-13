@@ -1,0 +1,26 @@
+{
+  "name": "2026社區消費連環賞 - 優惠券管理器",
+  "short_name": "優惠券管理器",
+  "description": "澳門2026社區消費連環賞，簡潔實用的電子優惠券記錄工具。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1e5f9e",
+  "lang": "zh-HK",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
