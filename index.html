@@ -1908,6 +1908,17 @@
     init();
 </script>
 
-<!-- <script defer src="https://events.vercount.one/js"></script> -->
+
+    <!-- PWA Service Worker 註冊 -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('✅ Service Worker 已註冊:', reg.scope))
+      .catch(err => console.warn('⚠️ Service Worker 註冊失敗:', err));
+  });
+}
+</script>
+<script defer src="https://events.vercount.one/js"></script>
 </body>
 </html>
